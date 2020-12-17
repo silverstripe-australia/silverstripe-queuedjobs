@@ -344,6 +344,20 @@ class QueuedJobDescriptor extends DataObject
     }
 
     /**
+     * @return string
+     */
+    public function getTrimmedImplementation()
+    {
+        $segments = explode('\\', $this->Implementation);
+
+        while (count($segments) > 2) {
+            array_shift($segments);
+        }
+
+        return implode('\\', $segments);
+    }
+
+    /**
      * Return a map of numeric JobType values to localisable string representations.
      * @return array
      */
@@ -357,13 +371,11 @@ class QueuedJobDescriptor extends DataObject
     }
 
     /**
-     * @return FieldList
+     * @return array
      */
-    public function getCMSFields()
+    public function getJobStatusValues()
     {
-        $fields = parent::getCMSFields();
-
-        $statuses = [
+        return [
             QueuedJob::STATUS_NEW,
             QueuedJob::STATUS_INIT,
             QueuedJob::STATUS_RUN,
@@ -373,6 +385,16 @@ class QueuedJobDescriptor extends DataObject
             QueuedJob::STATUS_CANCELLED,
             QueuedJob::STATUS_BROKEN,
         ];
+    }
+
+    /**
+     * @return FieldList
+     */
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+
+        $statuses = $this->getJobStatusValues();
 
         $runAs = $fields->fieldByName('Root.Main.RunAsID');
 
